@@ -19,7 +19,7 @@ const pool = new Pool({
 const allowedOrigins = [
   "http://localhost:8080",
   "http://127.0.0.1:8080",
-  "https://tp-docker-cicd-orpin.vercel.app/",
+  "https://tp-docker-cicd-orpin.vercel.app",
 ].filter(Boolean);
 
 app.use(
