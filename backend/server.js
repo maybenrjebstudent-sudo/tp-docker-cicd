@@ -16,13 +16,22 @@ const pool = new Pool({
 });
 
 // CORS MIDDLEWARE
+const allowedOrigins = [
+  "http://localhost:8080",
+  "http://127.0.0.1:8080",
+  "https://tp-docker-cicd-orpin.vercel.app/",
+].filter(Boolean);
+
 app.use(
     cors({
-      origin: [
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        process.env.FRONTEND_URL, // e.g. https://your-frontend.onrender.com
-      ].filter(Boolean),
+      origin: function (origin, callback) {
+        // Allow requests with no origin (e.g. curl, Postman)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
+      },
       methods: ["GET", "POST", "OPTIONS"],
       allowedHeaders: ["Content-Type"],
     })
