@@ -8,42 +8,45 @@
 </head>
 
 <body>
-  <div class="container">
-    <h1>TP Docker Avancé</h1>
-    <h2>Frontend Statique</h2>
+<div class="container">
+  <h1>TP Docker Avancé</h1>
+  <h2>Frontend Statique</h2>
 
-    <pre id="api-response">Loading API data...</pre>
-    <pre id="db-response">Loading Database data...</pre>
-  </div>
+  <pre id="api-response">Loading API data...</pre>
+  <pre id="db-response">Loading Database data...</pre>
+</div>
 
-  <script>
-    async function fetchData() {
-      try {
-        // Fetch API status
-        const apiResponse = await fetch("http://localhost:3000/api");
-        if (!apiResponse.ok) throw new Error("API request failed");
+<script>
+  // Replace this with your actual Render backend URL
+  const BACKEND_URL = "https://your-backend.onrender.com";
 
-        const apiData = await apiResponse.json();
-        document.getElementById("api-response").innerText =
-          JSON.stringify(apiData, null, 2);
+  async function fetchData() {
+    try {
+      // Fetch API status
+      const apiResponse = await fetch(`${BACKEND_URL}/api`);
+      if (!apiResponse.ok) throw new Error("API request failed");
 
-        // Fetch database data
-        const dbResponse = await fetch("http://localhost:3000/db");
-        if (!dbResponse.ok) throw new Error("Database request failed");
+      const apiData = await apiResponse.json();
+      document.getElementById("api-response").innerText =
+              JSON.stringify(apiData, null, 2);
 
-        const dbData = await dbResponse.json();
-        document.getElementById("db-response").innerText =
-          JSON.stringify(dbData, null, 2);
+      // Fetch database data
+      const dbResponse = await fetch(`${BACKEND_URL}/db`);
+      if (!dbResponse.ok) throw new Error("Database request failed");
 
-      } catch (error) {
-        document.getElementById("api-response").innerText =
-          `Error: ${error.message}`;
-        document.getElementById("db-response").innerText =
-          `Error: ${error.message}`;
-      }
+      const dbData = await dbResponse.json();
+      document.getElementById("db-response").innerText =
+              JSON.stringify(dbData, null, 2);
+
+    } catch (error) {
+      document.getElementById("api-response").innerText =
+              `Error: ${error.message}`;
+      document.getElementById("db-response").innerText =
+              `Error: ${error.message}`;
     }
+  }
 
-    setTimeout(fetchData, 1000);
-  </script>
+  setTimeout(fetchData, 1000);
+</script>
 </body>
 </html>

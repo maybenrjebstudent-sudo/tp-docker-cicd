@@ -1,30 +1,31 @@
-const express = require("express"); // Web framework
-const cors = require("cors"); // CORS management
-const { Pool } = require("pg"); // PostgreSQL client
+const express = require("express");
+const cors = require("cors");
+const { Pool } = require("pg");
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Configurable port
+const PORT = process.env.PORT || 3000;
 
 // Database connection configuration
 const pool = new Pool({
-  host: process.env.DB_HOST || "db",
+  host: process.env.DB_HOST,
   port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER || "admin",
-  password: process.env.DB_PASSWORD || "secret",
-  database: process.env.DB_NAME || "mydb",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
 });
 
-// CORS MIDDLEWARE: Allow cross-origin requests
+// CORS MIDDLEWARE
 app.use(
-  cors({
-    origin: [
-      "http://localhost:8080", // Frontend via host port
-      "http://127.0.0.1:8080", // Alternative localhost
-      "http://backend", // Docker service name (internal tests)
-    ],
-    methods: ["GET", "POST", "OPTIONS"], // Allowed HTTP methods
-    allowedHeaders: ["Content-Type"], // Allowed headers
-  })
+    cors({
+      origin: [
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        process.env.FRONTEND_URL, // e.g. https://your-frontend.onrender.com
+      ].filter(Boolean),
+      methods: ["GET", "POST", "OPTIONS"],
+      allowedHeaders: ["Content-Type"],
+    })
 );
 
 // MAIN API ROUTE
@@ -37,11 +38,10 @@ app.get("/api", (req, res) => {
   });
 });
 
-// DATABASE ROUTE: Retrieve data from database
+// DATABASE ROUTE
 app.get("/db", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users");
-
     res.json({
       message: "Data from Database",
       data: result.rows,
@@ -57,9 +57,9 @@ app.get("/db", async (req, res) => {
   }
 });
 
-// START SERVER
-app.listen(PORT, () => {
+// START SERVER — must bind to 0.0.0.0 for Render
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend listening on port ${PORT}`);
-  console.log(`API endpoint: http://localhost:${PORT}/api`);
-  console.log(`DB endpoint: http://localhost:${PORT}/db`);
+  console.log(`API endpoint: /api`);
+  console.log(`DB endpoint: /db`);
 });
